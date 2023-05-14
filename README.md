@@ -1,5 +1,3 @@
-# graphql-kafka-payment-system
-
 # GraphQL Kafka API Payment System
 
 [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org)

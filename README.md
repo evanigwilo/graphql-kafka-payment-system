@@ -10,14 +10,14 @@ Users can create account (includes an initial amount), transfer funds to another
 
 ### GraphQL Resolvers
 
-| Resolvers     | Description                                  |
-| ------------- | -------------------------------------------- |
-| account       | Gets authenticated user account information. |
-| balance       | Gets authenticated user account balance.     |
-| transactions  | Gets authenticated user transaction history  |
-| login         | Logs in and authenticates users.             |
-| createAccount | Registers and authenticates users.           |
-| transfer      | Transfers funds to another user's account    |
+| Resolvers     | Description                                    |
+| ------------- | ---------------------------------------------- |
+| account       | Gets authenticated user account information.   |
+| balance       | Gets authenticated user account balance.       |
+| transactions  | Gets authenticated user transaction history.   |
+| login         | Logs in and authenticates users.               |
+| createAccount | Registers and authenticates users.             |
+| transfer      | Transferring of funds to other user's account. |
 
 ## Requirements
 
@@ -46,7 +46,7 @@ $ cd graphql-kafka-payment-system
 
 2. Change environmental variables filename from `.env.example` to `.env`
 
-3. In the backend directory, update the `.env` file values for the following variables:
+3. Update the `.env` file values for the following variables:
 
 ```bash
 # Kafka configurations
@@ -55,13 +55,13 @@ KAFKA_CLUSTER_API_KEY=
 KAFKA_CLUSTER_API_SECRET=
 ```
 
-4. At the root directory **graphql-kafka-payment-system**, run the following command:
+4. At the root directory, run the following command:
 
 ```bash
 # Create external docker volume for the mongo database
 $ docker volume create mongo-db-volume
 
-# Build and run backend in a container environment
+# Build and run the server in a container environment
 $ docker-compose --env-file .env -p payment-system-stack -f docker-compose.yml up --build -d
 ```
 

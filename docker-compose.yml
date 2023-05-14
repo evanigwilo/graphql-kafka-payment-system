@@ -1,0 +1,83 @@
+# version is now using "compose spec"
+# v2 and v3 are now combined!
+# docker-compose v1.27+ required
+version: "3"
+
+services:
+  api-server:
+    container_name: api-server
+    build:
+      context: .
+    volumes:
+      - ./src:/backend/src:ro
+    environment:
+      REDIS_DB_HOST: redis-db
+      MONGO_DB_HOST: mongo-db
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    networks:
+      - back-tier
+    # for consistent connection to the host on all platforms (Mac, Windows, and Linux)
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+  redis:
+    container_name: redis-db
+    image: redis:5.0-alpine3.10
+    volumes:
+      - redis-data:/data
+      - ./healthchecks:/healthchecks:ro
+    healthcheck:
+      test: /healthchecks/redis.sh
+      # check for 1 min before considered unhealthy
+      interval: 3s
+      retries: 20
+    ports:
+      - ${REDIS_DB_PORT}:${REDIS_DB_PORT}
+    networks:
+      - back-tier
+    restart: unless-stopped # always
+
+  mongo:
+    container_name: mongo-db
+    image: mongo:4.4.13
+    volumes:
+      - mongo-db:/data/db
+      - mongo-config:/data/configdb
+      - ./healthchecks:/healthchecks:ro
+    healthcheck:
+      test: [ "CMD", "sh", "healthchecks/mongo.sh" ]
+      # check for 1 min before considered unhealthy
+      interval: 3s
+      retries: 20
+    ports:
+      - ${MONGO_DB_PORT}:${MONGO_DB_PORT}
+    networks:
+      - back-tier
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_DB_PORT: ${MONGO_DB_PORT}
+    restart: unless-stopped # always
+
+volumes:
+  # external: true -> keeps volumes when destroyed using docker-compose down -v
+  mongo-db:
+    name: mongo-db-volume
+    external: true
+
+  redis-data:
+    name: redis-data-volume
+
+  mongo-config:
+    name: mongo-config-volume
+
+networks:
+  back-tier:
